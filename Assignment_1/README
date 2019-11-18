@@ -1,0 +1,109 @@
+TCP Echo SErver and Client
+===============
+
+TCP Echo Server and Client
+ECEN 602 Network Programming Assignment 1
+
+
+Role
+===============
+Mainly, we worked together, but here is the role what we did.
+Minhwan Oh : Developed server programming, debugged for integration 
+Sanghyeon Lee : Developed client programming, tested for integration
+
+
+File info
+===============
+For this program, you can see how TCP echo works. There are two main files. 
+1. echos
+Path: cd tcpcliserv/echos.c
+Main feature: TCP Server
+2. echo
+Path: cd tcpcliserv/echo.c
+Main feature: TCP Client
+3. unp.h
+Path: cd tcpcliserv/unp.h
+Main feature: Packages for socket programming function *Refers to Unix Network Programming library*
+4. makefile
+Path: cd tcpcliserv/makefile
+
+Build info
+===============
+Go to tcpcliserv folder, then $make
+
+Program scenario
+===============
+This program includes client and server for a simple TCP echo service, which does the following and:
+
+1. Start the server first with the command line: $echos <Port>, where echos is the name of the server program and Port is the port number on which the server is listening. The server must support multiple simultaneous connections.
+
+2. Start the client second with a command line: $echo <IPAdr> <Port>, where echo is the name of the client program, IPAdr is the IPv4 address of the server in dotted decimal notation, and Port is the port number on which the server is listening.
+
+3. Type any word with a command line where client is running, then you can see the echo. 
+
+
+Program details - Echo
+===============
+1. The client reads a line of text from its standard input and writes the line to the network output to the server.
+
+2. The sever reads the line from its network input and echoes the line back to the client.
+
+3. The client reads the echoed line and prints it on its standard input.
+
+4. When the client reads an EOF from its standard input (e.g., terminal input of Control-D), it closes the socket and exits. When the client closes the socket, the server will receive a TCP FIN packet, and the server child process’ read() command will return with a 0. The child process should then exit
+
+File architecture 
+===============
+1. Server
+a) Architecture 
+	- Scenario : 
+		(1) Setup bind/listen/sig_child function, then going to infinite loop until the exit
+		(2) Each child process has different PID
+	- Main function : 
+		(1) int main(int argc, char **argv): Including main scenario
+		(2) void str_echo(int sockfd): Received data, and sending echo data
+
+b) Feature 
+	- Create socket and bind the well-known port of server
+	- Wait for client and accept the connection	
+	- Make and print out child process to support multiple simultaneous connections from clients
+
+2. Client
+a) Architecture
+	- Scenario : 
+		(1) Setup socket/connect function, then going to infinite loop until the exit
+	- Main function : 
+		(1) int main(int argc, char **argv): Including main scenario
+		(2) void str_cli(FILE *fp, int sockfd): Sending data, and received echo data
+
+
+Test cases
+===============
+Current program passed below test cases
+(1) line of text terminated by a newline - If you type words and enter key, you can see echo data.
+(2) line of text the maximum line length without a newline - Even if you type more than number of maximum line, you can see echo data due to running send/read function automatically
+(3) line with no characters and EOF - If you type just enter key, you can see enter key is working
+(4) client terminated after entering text - If you type  terminal input of Control-D, client closes the socket and exit. Server cleans up the client process.
+(5) three clients connected to the server - If you run three client programs at same time, you can see all clients are working
+
+Reference
+===============
+Below functions are referred by network programming library, W. Richard Stevens, Bill Fenner, and Andrew M. Rudoff, Unix Network
+Programming, Volume 1, The Sockets Networking API, 3rd Edition
+
+1) echo.c
+	- static ssize_t my_read(int fd, char *ptr)
+	- ssize_t readline(int fd, void *vptr, size_t maxlen)
+	- ssize_t Readline(int fd, void *ptr, size_t maxlen)
+	- ssize_t	writen(int fd, const void *vptr, size_t n) /* Write "n" bytes to a descriptor. */
+	- char * Fgets(char *ptr, int n, FILE *stream)
+	- void Writen(int fd, void *ptr, size_t nbytes)
+
+2) echos.c
+	- Sigfunc * signal(int signo, Sigfunc *func)
+	- Sigfunc * Signal(int signo, Sigfunc *func)	/* for our signal() function */
+	- ssize_t writen(int fd, const void *vptr, size_t n) /* Write "n" bytes to a descriptor. */		
+	- void Writen(int fd, void *ptr, size_t nbytes)	
+	- void sig_chld(int signo)		
+
+

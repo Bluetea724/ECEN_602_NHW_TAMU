@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "limits.h": "c",
+        "xos.h": "c",
+        "sum.h": "c",
+        "unp.h": "c"
+    }
+}
